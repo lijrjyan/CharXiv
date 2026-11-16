@@ -1,4 +1,5 @@
 import base64
+import os
 import requests
 
 def get_client_model(model_path, api_key):
@@ -65,6 +66,6 @@ def generate_response(image_path, query, model, media_type="image/jpeg", api_key
         "seed": 42
         }
 
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+    response = requests.post(os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/") + "/chat/completions", headers=headers, json=payload)
     response = response.json()
     return response['choices'][0]['message']['content']

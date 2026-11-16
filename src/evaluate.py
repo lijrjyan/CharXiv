@@ -27,7 +27,7 @@ if __name__ == "__main__":
         # group the responses based on the template id instead of figure id
         groups = preprocess_descriptive_grading_queries(data, response)
         # batched evaluation based on number of questions per query (nq_per_query)
-        queries = build_descriptive_grading_queries(groups)
+        queries = build_descriptive_grading_queries(groups, nq_per_query=1)
         combined_queries = []
         for query in tqdm(queries):
             result = get_descriptive_result_gpt(client, query['grading_query'], len(query['resp_keys']))

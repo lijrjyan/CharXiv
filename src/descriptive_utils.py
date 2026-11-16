@@ -1,3 +1,4 @@
+import os
 import os, json
 from constants import DESCRIPTIVE_RESP_INST, DESCRIPTIVE_GRADING_PREFIX, \
             DESCRIPTIVE_GRADING_QMAP, DESCRIPTIVE_GRADING_ICL
@@ -33,7 +34,7 @@ def get_descriptive_result_gpt(client, prompt, length, max_retries=10):
                         "content": prompt,
                     }
                 ],
-                model="gpt-4o-2024-05-13",
+                model=os.environ.get("CHARXIV_JUDGE_MODEL", "gpt-4o-2024-08-06"),
                 response_format={"type": "json_object"},
                 n=1,
                 max_tokens=max_tokens,
