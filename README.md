@@ -1,3 +1,39 @@
+> **Harbor parity fork (branch `harbor-parity`).** This branch is upstream CharXiv at
+> `7ebe88f` with three changes needed to run the original side of the parity
+> experiment for the Harbor CharXiv adapter
+> ([harbor-framework/adapters#85](https://github.com/harbor-framework/adapters/pull/85)):
+>
+> 1. **Judge model** (`src/descriptive_utils.py`, `src/reasoning_utils.py`): upstream's
+>    `gpt-4o-2024-05-13` is retired; the judge is read from `CHARXIV_JUDGE_MODEL`
+>    (default `gpt-4o-2024-08-06`, the Harbor verifier's default).
+> 2. **Descriptive grading batch** (`src/evaluate.py`): `nq_per_query=1`, one question
+>    per judge call, as in each Harbor task. The prompt template is unchanged.
+> 3. **OpenAI base URL** (`src/generate_lib/gpt.py`): read from `OPENAI_BASE_URL`
+>    (default `https://api.openai.com/v1`).
+>
+> Generation, prompts, call parameters, retries and scoring are otherwise upstream's.
+>
+> **Reproducing one parity run** (download the images into `./images` as described
+> below and install `openai requests tqdm` first):
+>
+> ```bash
+> export OPENAI_API_KEY=...
+> python harbor_parity/make_subset.py --out parity_run1 && cd parity_run1   # 100 parity charts
+> M=gpt-4o-mini-2024-07-18
+> for mode in descriptive reasoning; do
+>   python src/generate.py --model_name $M --model_path $M --model_api "$OPENAI_API_KEY" --mode $mode --data_dir ./data --image_dir ./images --output_dir ./results
+>   python src/evaluate.py --model_name $M --split val --mode $mode --api_key "$OPENAI_API_KEY"
+> done
+> python src/get_stats.py --model_name $M --split val
+> ```
+>
+> `harbor_parity/run_parity.sh parity_run1` does the same. The reported results used
+> three runs (`parity_run1`..`parity_run3`): descriptive accuracy 74.5 / 73.5 / 75.0 %,
+> reasoning accuracy 33.0 / 36.0 / 34.0 % (`gpt-4o-mini-2024-07-18`, 2026-11-16).
+> Accuracy per metric is the fraction of `score == 1` in
+> `parity_run*/results/scores-<model>-{descriptive,reasoning}_val.json`.
+> See [`harbor_parity/README.md`](harbor_parity/README.md) for details.
+
 # 📊 CharXiv
 🏠[Home](https://charxiv.github.io/) | 🤗[Data](https://huggingface.co/datasets/princeton-nlp/CharXiv) | 🥇[Leaderboard](https://charxiv.github.io/#leaderboard) | 📄[Paper](https://arxiv.org/abs/2406.18521) | *Current Version: v1.0*
 
